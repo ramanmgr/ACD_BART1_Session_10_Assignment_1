@@ -6,9 +6,29 @@ getwd()
 
 #1. Read the file in Zip format and get it into R.
 
-airquality <- read.csv("D:\\BIG DATA\\DATA ANALYTICS WITH R, EXCEL & TABLEAU\\10 CORRELATIONS\\AirQualityUCI.csv", sep=";")
-#then view our file
+
+forecasturl = paste('https://archive.ics.uci.edu/ml/machine-learning-databases/00360/', 
+                    'AirQualityUCI.zip', sep='')
+# create a temporary directory
+td = tempdir()
+# create the placeholder file
+tf = tempfile(tmpdir=td, fileext=".zip")
+# download into the placeholder file
+download.file(forecasturl, tf)
+
+# get the name of the first file in the zip archive
+fname = unzip(tf, list=TRUE)$Name[1]
+fname
+# unzip the file to the temporary directory
+unzip(tf, files=fname, exdir=td, overwrite=TRUE)
+
+# fpath is the full path to the extracted file
+fpath = file.path(td, fname)
+fpath
+airquality = read.csv(fpath,sep = ";")
 View(airquality)
+
+
 
 
 #2. Create Univariate for all the columns.
@@ -35,12 +55,12 @@ airquality %>%
 #or we can plot univariate individually for each variable
 #hence plotting histogram
 
-hist(airquality$PT08.S1.CO,xlab = "PT08.S1(CO)", ylab = "Frequency",main="Histogram of ozone",col="red")
-hist(airquality$NMHC.GT,xlab = "NMHC(GT)", ylab = "Frequency",main="Histogram of solar.r",col="blue")
-hist(airquality$PT08.S2.NMHC,xlab = "PT08.S2(NMHC)", ylab = "Frequency",main="Histogram of wind",col="yellow")
-hist(airquality$NOx.GT ,xlab = "NOx(GT)", ylab = "Frequency",main="Histogram of temp",col="darkblue")
-hist(airquality$PT08.S3.NOx,xlab = "PT08.S3(NOx)", ylab = "Frequency",main="Histogram of month",col="pink")
-hist(airquality$NO2.GT,xlab = "NO2(GT)", ylab = "Frequency",main="Histogram of day",col="purple")
+hist(airquality$PT08.S1.CO,xlab = "PT08.S1(CO)", ylab = "Frequency",main="Histogram of PT08.S1.CO",col="red")
+hist(airquality$NMHC.GT,xlab = "NMHC(GT)", ylab = "Frequency",main="Histogram of NMHC.GT",col="blue")
+hist(airquality$PT08.S2.NMHC,xlab = "PT08.S2(NMHC)", ylab = "Frequency",main="Histogram of PT08.S2.NMHC",col="yellow")
+hist(airquality$NOx.GT ,xlab = "NOx(GT)", ylab = "Frequency",main="Histogram of NOx.GT",col="darkblue")
+hist(airquality$PT08.S3.NOx,xlab = "PT08.S3(NOx)", ylab = "Frequency",main="Histogram of PT08.S3.NOx",col="pink")
+hist(airquality$NO2.GT,xlab = "NO2(GT)", ylab = "Frequency",main="Histogram of NO2.GT",col="purple")
 
 #3. Check for missing values in all columns.
 
@@ -75,33 +95,7 @@ summary(imputed_Data)
 
 
 completeData <- complete(imputed_Data)
-completeData
-
-#or we can do like this too
-#in another way say do for variable Solar.R in airquality dataset
-newair =airquality
-
-dim(newair)
-str(newair)
-summary(newair)
-#before imputing
-hist(newair$Solar.R ,xlab = "Solar.R", ylab = "frequency",main="histogram of Solar.R",col="red")
-
-mean(newair$Solar.R)
-mean(newair$Solar.R,na.rm = T)
-
-#imputed my mean
-newair$Solar.R[is.na(newair$Solar.R)]<- mean(newair$Solar.R,na.rm = T)
-
-#check summary after done with imputing
-summary(newair)
-newair$Solar.R
-
-#visualize after imputing the variable Solar.R with the mean
-#lets visualize through histogram
-
-#after imputing
-hist(newair$Solar.R ,xlab = "Solar.R", ylab = "frequency",main="histogram of Solar.R",col="blue")
+View(completeData)
 
 
 #5. Create bi-variate analysis for all relationships.
@@ -118,7 +112,7 @@ pairs.panels( airquality[,c(1,2,3,4,5,6)],
 
 
 #6. Test relevant hypothesis for valid relations.
-
+#Using builtin dataset (airquality)
 #lets see the structure first
 str(airquality)
 
@@ -142,7 +136,7 @@ t.test(x=airquality$Day, y=airquality$Solar.R ,alternative = "two.sided",mu=0 ,p
 
 
 #7. Create cross tabulations with derived variables.
-
+#we are using Builtin data "airquality"
 attach(airquality)
 unique(Wind)
 unique(Temp)
